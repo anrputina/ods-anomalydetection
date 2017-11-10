@@ -23,16 +23,16 @@ Based on which of the two criteria you choose the input parameters are the follo
 
 > * **lamb**: the fading factor $\lambda$
 > * **epsilon**: the radius $\epsilon$
->  * **'auto'**: computes automatically the radius of the initial cluster (if you don't use the initial DBScan)
->  *  **int** or **float**: $\epsilon$ value integer of float
+>   * **'auto'**: computes automatically the radius of the initial cluster (if you don't use the initial DBScan)
+>   * **int** or **float**: $\epsilon$ value integer of float
 > * **minPts**: DBScan parameter, if used
 > * **beta**: potential factor $\beta$
 > * **mu**: cluster weight $\mu$
->  * **'auto'**: computes automatically the maximum weight of the cluster, due to fading function
->  * **int** or **float**:  $\mu$ value integer or float
+>   * **'auto'**: computes automatically the maximum weight of the cluster, due to fading function
+>   * **int** or **float**:  $\mu$ value integer or float
 > * **numberInitialSample**: number of samples needed before starting the DBScan algorithm on the gathered samples. Only if you use DBSCan.
 > * **startingBuffer**: buffer with the initial samples
-> *  **tp**: checking period of the clusters weight. Needed for pruning, if the weight of the clusters goes below the threshold $\beta \cdot \mu$: remove them.
+> * **tp**: checking period of the clusters weight. Needed for pruning, if the weight of the clusters goes below the threshold $\beta \cdot \mu$: remove them.
 
 Example:
 
