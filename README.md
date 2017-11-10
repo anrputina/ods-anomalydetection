@@ -1,14 +1,12 @@
 **OutlierDenStream**
 ===================
 
-----
 
 OutlierDenStream is a custom implementation of the DenStream algorithm used for Anomaly Detection in an Unsupervised environment written in Python. 
 
 Description
 -------------
 
------
 
 The algorithm uses the concept of micro-cluster, distances, parameters and pruning strategies introduced in DenStream. It maintains the clusters incrementally and as soon as a new sample (snapshot) is available it labels it as Normal or Abnormal: e.g. if the new sample is merged to a existing core-micro-cluster then it is considered normal.
 
@@ -18,7 +16,6 @@ The algorithm can be used to monitor **Telemetry** and raise an alarm when neede
 Documents
 -------------
 
------
 
 The first phase of the algorithm consist in discovering the clusters thus there is the need first of all to gather samples or use a buffer dataset then run then DBScan algorithm and obtain the clusters. From now on it is possible to maintain them incrementally. On the other hand it is possible to use the buffer dataset as a unique cluster without applying DBScan such that all the samples are considered as belonging to a cluster. 
 
@@ -26,16 +23,16 @@ Based on which of the two criteria you choose the input parameters are the follo
 
 > * **lamb**: the fading factor $\lambda$
 > * **epsilon**: the radius $\epsilon$
-  * **'auto'**: computes automatically the radius of the initial cluster (if you don't use the initial DBScan)
-  *  **int** or **float**: $\epsilon$ value integer of float
+>  * **'auto'**: computes automatically the radius of the initial cluster (if you don't use the initial DBScan)
+>  *  **int** or **float**: $\epsilon$ value integer of float
 > * **minPts**: DBScan parameter, if used
 > * **beta**: potential factor $\beta$
 > * **mu**: cluster weight $\mu$
-  * **'auto'**: computes automatically the maximum weight of the cluster, due to fading function
-  * **int** or **float**:  $\mu$ value integer or float
-* **numberInitialSample**: number of samples needed before starting the DBScan algorithm on the gathered samples. Only if you use DBSCan.
-* **startingBuffer**: buffer with the initial samples
-*  **tp**: checking period of the clusters weight. Needed for pruning, if the weight of the clusters goes below the threshold $\beta \cdot \mu$: remove them.
+>  * **'auto'**: computes automatically the maximum weight of the cluster, due to fading function
+>  * **int** or **float**:  $\mu$ value integer or float
+> * **numberInitialSample**: number of samples needed before starting the DBScan algorithm on the gathered samples. Only if you use DBSCan.
+> * **startingBuffer**: buffer with the initial samples
+> *  **tp**: checking period of the clusters weight. Needed for pruning, if the weight of the clusters goes below the threshold $\beta \cdot \mu$: remove them.
 
 Example:
 
@@ -66,7 +63,6 @@ Thus on each new available sample, the **.runOnNewSample()** method is run and t
 Coming Soon
 -------------
 
----
 
 * Examples and Results
 * Detailed description of the algorithm
@@ -79,7 +75,6 @@ Coming Soon
 Installation
 ---
 
----
 Clone the repository and import in your project DenStream and Sample
 
 ```python
