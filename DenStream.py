@@ -53,19 +53,12 @@ class DenStream():
         
         ### Running parameters ###
         self.inizialized = False
-        self.historyBool = False
 
         ### Real timestamp or steps ###          
         if simulation:
             self.currentTimestamp = 0
         else:
             self.currentTimestamp = time.time()
-        
-    def setHistory(self, state):
-        self.historyBool = state
-        
-        if state == True:
-            self.history = []
         
     def resetLearningImpl(self):
         
@@ -190,7 +183,8 @@ class DenStream():
         else:
             merged = False
             TrueOutlier = True
-            
+            returnOutlier = True
+
             if len(self.pMicroCluster.clusters) != 0:
                 closestMicroCluster = self.nearestCluster(sample, self.currentTimestamp, kind='cluster')
                                 
@@ -202,17 +196,7 @@ class DenStream():
                     closestMicroCluster.insertSample(sample, self.currentTimestamp)
                     merged = True
                     TrueOutlier = False
-                
-                    if self.historyBool:
-                        
-                        record = {
-                                    'event': 'Merged',
-                                    'time': self.currentTimestamp,
-                                    'cluster': closestMicroCluster,
-                                    'realTime': sample.realTimestamp
-                                }
-                        
-                        self.history.append(record)
+                    returnOutlier = False
                     
                     self.updateAll(closestMicroCluster)
                     
@@ -230,28 +214,7 @@ class DenStream():
                     if (closestMicroCluster.weight > self.beta * self.mu):
                         self.oMicroCluster.clusters.pop(self.oMicroCluster.clusters.index(closestMicroCluster))
                         self.pMicroCluster.insert(closestMicroCluster)
-
-                    for clusterTest in self.pMicroCluster.clusters:
-
-                        if np.linalg.norm(clusterTest.center-closestMicroCluster.center) < 2 * self.epsilon:
-                            TrueOutlier = False
                     
-                    if self.historyBool:
-                        if TrueOutlier == True:
-                            record = {
-                                        'event': 'Outlier',
-                                        'time': self.currentTimestamp,
-                                        'realTime': sample.realTimestamp
-                                    }
-                        else:
-                            record = {
-                                        'event': 'Merged',
-                                        'time': self.currentTimestamp,
-                                        'realTime': sample.realTimestamp
-                                    }
-                            
-                        self.history.append(record)
-
                     self.updateAll(closestMicroCluster)
                         
                     
@@ -264,45 +227,20 @@ class DenStream():
                     if np.linalg.norm(clusterTest.center-newOutlierMicroCluster.center) < 2 * self.epsilon:
                         TrueOutlier = False
 
-                if self.historyBool:
-                    if TrueOutlier == True:
-                        record = {
-                                    'event': 'Outlier',
-                                    'time': self.currentTimestamp,
-                                    'realTime': sample.realTimestamp
-                                }
-                            
-                    else:
-                        record = {
-                                    'event': 'Merged',
-                                    'time': self.currentTimestamp,
-                                    'realTime': sample.realTimestamp
-                                }
-                    self.history.append(record)                
-
-                        
-                self.oMicroCluster.insert(newOutlierMicroCluster)                
-                self.updateAll(newOutlierMicroCluster)
+                if TrueOutlier:
+                    self.oMicroCluster.insert(newOutlierMicroCluster)
+                    self.updateAll(newOutlierMicroCluster)
+                else:
+                    self.pMicroCluster.insert(newOutlierMicroCluster)
+                    self.updateAll(newOutlierMicroCluster)
+                    returnOutlier = False
                 
             if self.currentTimestamp % self.tp == 0:
                             
-                radiusNew = 0
-                maxN = 0
-                
                 for cluster in self.pMicroCluster.clusters:
 
                     if cluster.weight < self.beta * self.mu:
                         self.pMicroCluster.clusters.pop(self.pMicroCluster.clusters.index(cluster))
-                        
-                        if self.historyBool:
-                            
-                            record = {
-                                        'event': 'pRemoved',
-                                        'time': self.currentTimestamp,
-                                        'realTime': sample.realTimestamp
-                                    }
-                            
-                            self.history.append(record)
                         
                 for cluster in self.oMicroCluster.clusters:
                     
@@ -316,14 +254,4 @@ class DenStream():
                         
                         self.oMicroCluster.clusters.pop(self.oMicroCluster.clusters.index(cluster))
                         
-                        if self.historyBool:
-                            
-                            record = {
-                                        'event': 'oRemoved',
-                                        'time': self.currentTimestamp,
-                                        'realTime': sample.realTimestamp
-                                    }
-                            
-                            self.history.append(record)
-
-            return TrueOutlier
+            return returnOutlier

@@ -56,7 +56,9 @@ class MicroCluster():
 
         LSd = np.power(self.center, 2)
         SSd = np.divide(self.SS, float(self.weight))
+
         maxRad = np.nanmax(np.sqrt(SSd-LSd))
+        # maxRad = np.nanmax(np.lib.scimath.sqrt(SSd-LSd))
                     
         self.radius = maxRad        
 
