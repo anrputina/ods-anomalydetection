@@ -19,20 +19,20 @@ Documents
 
 The first phase of the algorithm consist in discovering the clusters thus there is the need first of all to gather samples or use a buffer dataset then run then DBScan algorithm and obtain the clusters. From now on it is possible to maintain them incrementally. On the other hand it is possible to use the buffer dataset as a unique cluster without applying DBScan such that all the samples are considered as belonging to a cluster. 
 
-Based on which of the two criteria you choose the input parameters are the following one:
+The input parameters are the following one:
 
-> * **lamb**: the fading factor $\lambda$
-> * **epsilon**: the radius $\epsilon$
+> * **lamb**: the fading factor <img src="https://latex.codecogs.com/gif.latex?\lambda" title="\lambda" />
+> * **epsilon**: the radius <img src="https://latex.codecogs.com/gif.latex?\epsilon" title="\epsilon" />
 >   * **'auto'**: computes automatically the radius of the initial cluster (if you don't use the initial DBScan)
->   * **int** or **float**: $\epsilon$ value integer of float
+>   * **int** or **float**: <img src="https://latex.codecogs.com/gif.latex?\epsilon" title="\epsilon" /> value integer of float
 > * **minPts**: DBScan parameter, if used
-> * **beta**: potential factor $\beta$
-> * **mu**: cluster weight $\mu$
+> * **beta**: potential factor <img src="https://latex.codecogs.com/gif.latex?\beta" title="\beta" />
+> * **mu**: cluster weight <img src="https://latex.codecogs.com/gif.latex?\mu" title="\mu" />
 >   * **'auto'**: computes automatically the maximum weight of the cluster, due to fading function
->   * **int** or **float**:  $\mu$ value integer or float
+>   * **int** or **float**:  <img src="https://latex.codecogs.com/gif.latex?\mu" title="\mu" /> value integer or float
 > * **numberInitialSample**: number of samples needed before starting the DBScan algorithm on the gathered samples. Only if you use DBSCan.
 > * **startingBuffer**: buffer with the initial samples
-> * **tp**: checking period of the clusters weight. Needed for pruning, if the weight of the clusters goes below the threshold $\beta \cdot \mu$: remove them.
+> * **tp**: checking period of the clusters weight. Needed for pruning, if the weight of the clusters goes below the threshold <img src="https://latex.codecogs.com/gif.latex?\beta&space;\cdot&space;\mu" title="\beta \cdot \mu" />: remove them.
 
 Example:
 
