@@ -187,13 +187,16 @@ class Statistics():
 
         if output == 'dict':
 
+            if meanFalseRate[0] > 1:
+                meanFalseRate[0] = 1
+
             result = {
 
-                'Precision': meanPrecision.tolist(),
+                'Precision': np.nan_to_num(meanPrecision).tolist(),
                 'errPrecision': errorPrecision.tolist(),
-                'Recall': meanRecall.tolist(),
+                'Recall': np.nan_to_num(meanRecall).tolist(),
                 'errRecall': errorRecall.tolist(),
-                'FalseRate': meanFalseRate.tolist(),
+                'FalseRate': np.nan_to_num(meanFalseRate).tolist(),
                 'errFalseRate': errorFalse.tolist()
             }
 
@@ -206,7 +209,7 @@ class Statistics():
         else:
             return 
 
-    def getDelay(self, resultSimulation, kMAX, plot=False, samplingRate = 4):
+    def getDelay(self, resultSimulation, kMAX, plot=False, samplingRate = 5):
 
         depth = 3
 
@@ -245,9 +248,15 @@ class Statistics():
         delaymeansConfInterval = np.ndarray((kMAX,depth))  
 
         for k in range(1, kMAX + 1):
+#            ### OLD DATASETS 
             a = np.divide(delay0[k], 1000. * samplingRate)
             b = np.divide(delay1[k], 1000. * samplingRate)
             c = np.divide(delay2[k], 1000. * samplingRate)
+            
+            ### NEW DATASET FROM VIRL
+#            a = np.divide(delay0[k], samplingRate)
+#            b = np.divide(delay1[k], samplingRate)
+#            c = np.divide(delay2[k], samplingRate)            
             delaymeansConfInterval[k-1][0] = np.mean(a)
             delaymeansConfInterval[k-1][1] = np.mean(b)
             delaymeansConfInterval[k-1][2] = np.mean(c)
@@ -266,3 +275,101 @@ class Statistics():
             visual.plotBarDelay(delaymeansConfInterval, delayConfInterval, trunc='yes')
 
         return delaymeansConfInterval, delayConfInterval
+
+
+######################################################################################
+######################################################################################
+######################################################################################
+######################################################################################
+######################################################################################
+######################################################################################
+######################################################################################
+######################################################################################
+
+    def getNodeResultRealTime(self, df, times, kMAX=5):
+
+        probabilityDetection = self.computeDetectionProbabilityRealTime(df, times, kMAX)
+        falsePositives = self.findFalsePositiveDetectionRealTime(df, times, kMAX)
+
+        result = {
+                    'detections': probabilityDetection,
+                    'falsePositives': falsePositives
+                }
+
+        return result
+
+    def computeDetectionProbabilityRealTime(self, df, time, kMAX):
+
+        detections = {}
+
+        for k in range(1, kMAX+1):
+            detection = 0
+            events = 0
+            delays = []
+
+            for event in self.truth.events:
+
+                if event['ONLINE'] == True:
+                    if event['type'] == 'single':
+                        check = (time >= event['startTime']) & (time <= event['endTime'])
+                        currentEvent = df[check]
+                        indexes = currentEvent[currentEvent['result']==True].index
+                        position = findDistance(self.node, event['node'])
+
+                        lista = []
+                        for key, g in groupby(enumerate(indexes), lambda (i, x): i-x):
+                            lista.append(map(itemgetter(1), g))    
+                        
+                        checkOnce = True
+
+                        for sub in lista:
+                            if checkOnce:
+                                if len(sub) > k - 1:
+                                    detection += 1
+                                    events += 1
+
+                                    eventDelay = {
+                                            'type' : 'single',
+                                            'position' : position,
+                                            'delay': time.loc[sub[k-1]] - event['startTime']
+                                            }     
+                                    delays.append(eventDelay)
+                                    checkOnce = False
+
+                        if checkOnce:
+                            events += 1
+
+            detections[k] = {'detection': detection,
+                             'events': events, 
+                             'delays': delays}
+
+        return detections
+
+    def findFalsePositiveDetectionRealTime(self, df, time, kMAX):
+
+        false = {}
+        
+        for k in range(1, kMAX+1):
+                        
+            counterFalsePositives = 0
+            for event in self.truth.clears:
+                
+                check = (time > event['startTime']) & (time <= event['endTime'])
+                currentEvent = df[check]
+
+                indexes = currentEvent[currentEvent['result']==True].index
+                
+                lista = []
+                for key, g in groupby(enumerate(indexes), lambda (i, x): i-x):
+                    lista.append(map(itemgetter(1), g))
+        
+                for sub in lista:
+                    if len(sub) > k - 1:
+                        counterFalsePositives += 1
+                        
+            false[k] = counterFalsePositives
+
+        return false
+
+
+

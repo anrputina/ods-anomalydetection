@@ -37,13 +37,14 @@ nodes = ['leaf1', 'leaf2', 'leaf3', 'leaf5', 'leaf6', 'leaf7', 'leaf8',\
 def worker(beta):
 
     lambdas = np.arange(0.02, 0.03, 0.01)
+    lambdas = [0.03]
 
     results = []
     for lamb in lambdas:
 
         resultSimulation = {}
 
-        for simulationDataset in ['BGP_CLEAR', 'BGP_CLEAR2']:
+        for simulationDataset in ['BGP_CLEAR']:
         
             for node in nodes:
         
@@ -51,14 +52,14 @@ def worker(beta):
                     
                     df = pd.read_csv('Data/'+node+'base_no_traffic.csv').dropna()\
                             .drop('Unnamed: 0', axis=1)\
-                            .drop('MgmtEth0/RP0/CPU0/0reliability', axis=1)\
-                            .drop('MgmtEth0/RP0/CPU0/0packets-sent', axis=1)
+#                            .drop('MgmtEth0/RP0/CPU0/0reliability', axis=1)\
+#                            .drop('MgmtEth0/RP0/CPU0/0packets-sent', axis=1)
                             
                 elif simulationDataset == 'BGP_CLEAR':
                     ### DATA PLANE
                     df = pd.read_csv('Data/'+node+'_clearbgp.csv').dropna()\
                             .drop('Unnamed: 0', axis=1)\
-                            .drop('MgmtEth0/RP0/CPU0/0packets-sent', axis=1)\
+#                            .drop('MgmtEth0/RP0/CPU0/0packets-sent', axis=1)\
                 #            .drop('HundredGigE0/0/0/30packets-sent', axis=1)   
                 elif simulationDataset == 'BGP_CLEAR2':
                     ### DATA PLANE
@@ -79,6 +80,8 @@ def worker(beta):
                     if 'MgmtEth' in feature:
                         featuresDrop.append(feature)
                     if 'reliability' in feature:
+                        featuresDrop.append(feature)
+                    if 'Hundred' in feature:
                         featuresDrop.append(feature)
         
                 df = df.drop(featuresDrop, axis=1)
@@ -150,8 +153,8 @@ def worker(beta):
 
 if __name__ == '__main__':
     
-    betas = np.arange(0.02, 0.03, 0.01)
-    worker(0.02)
+#    betas = np.arange(0.03, 0.01)
+    worker(0.03)
 #    for beta in betas:
 #
 #        p = Process(target=worker, args=(beta,))

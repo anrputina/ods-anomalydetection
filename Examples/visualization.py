@@ -60,6 +60,22 @@ class Visualization():
 
         ax[len(features)-1].set_xlabel('Simulation Step')
   
+    def plotOutliersfromDF(self, df, times, truth):
+        
+        fig, ax = plt.subplots()
+        
+        outliers = df[df['result']==True]
+        
+        ax.plot(times, df['5paths-count'])
+        
+        for outlier in outliers.iterrows():
+            ax.plot(times.loc[outlier[0]], outlier[1]['5paths-count'], color='r', marker='o')
+        
+        for event in truth.events:
+            if event['type'] == 'single':
+                ax.axvspan(event['startTime'], event['endTime'], alpha=0.5, color='red')
+
+    
     def plotOutliersInteractive(self, features, df, outliers, merged, truth, stepsTrain=10):
         
         plotNumber = 0

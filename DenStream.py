@@ -33,6 +33,8 @@ class DenStream():
         self.tp = tp
         self.radiusFactor = 1
 
+        self.exportVariables = False
+
         ### Check input type: epsilon ### 
         if isinstance(epsilon, int) or isinstance(epsilon, float):
             self.epsilon = epsilon
@@ -254,4 +256,20 @@ class DenStream():
                         
                         self.oMicroCluster.clusters.pop(self.oMicroCluster.clusters.index(cluster))
                         
-            return returnOutlier
+            if self.exportVariables:
+                record = {
+                    'pMicroClusters': self.pMicroCluster.clusters,
+                    'oMicroClusters': self.oMicroCluster.clusters,
+                    'result': returnOutlier
+                }
+
+                return record
+
+            else:
+                return returnOutlier
+
+
+
+
+
+

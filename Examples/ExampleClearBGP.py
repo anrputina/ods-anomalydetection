@@ -25,6 +25,7 @@ def normalize_matrix(df):
 nodes = ['leaf1', 'leaf2', 'leaf3', 'leaf5', 'leaf6', 'leaf7', 'leaf8',\
          'spine1', 'spine2', 'spine3', 'spine4']
 
+nodes = ['leaf2']
 resultSimulation = {}
 
 for node in nodes:
@@ -32,16 +33,27 @@ for node in nodes:
     df = pd.read_csv('Data/'+node+'clear_bgp.csv').dropna()\
         .drop('Unnamed: 0', axis=1)
 
+    deleteFeatureList = []
+    
+    for columnName in df.columns:
+        if 'rate' in columnName:            
+            deleteFeatureList.append(columnName)
+        if 'load' in columnName:            
+            deleteFeatureList.append(columnName)
+
+            
+    df = df.drop(deleteFeatureList, axis=1)
+
     times = df['time']
     df = df.drop(['time'], axis=1)
 
     dfNormalized = normalize_matrix(df).dropna(axis=1)
 
-    sampleSkip = 41
+    sampleSkip = 35
     bufferDf = dfNormalized[0:sampleSkip]
     testDf = dfNormalized[sampleSkip:]
 
-    den = DenStream(lamb=0.02, epsilon='auto', beta=0.02, mu='auto', startingBuffer=bufferDf, tp=12)
+    den = DenStream(lamb=0.03, epsilon='auto', beta=0.03, mu='auto', startingBuffer=bufferDf, tp=12)
     den.runInitialization()
 
     outputCurrentNode = []
@@ -63,4 +75,4 @@ for node in nodes:
     resultSimulation[node] = statistics.getNodeResult(df, times, kMAX=5)
 
 statistics.getPrecisionRecallFalseRate(resultSimulation, kMAX=5, plot=True)
-statistics.getDelay(resultSimulation, kMAX=5, plot=True)
+statistics.getDelay(resultSimulation, kMAX=5, plot=True, samplingRate=4)

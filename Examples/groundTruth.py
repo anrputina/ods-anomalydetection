@@ -761,7 +761,9 @@ class groundTruth():
             'endidx': 39+50,
             'node': 'leaf1',
             'type': 'single',
-            'entity': 'single'
+            'entity': 'single',
+            'ONLINE' : False,
+            'endSent': False
         }
         
         self.addEvent(eventRecord)
@@ -773,7 +775,9 @@ class groundTruth():
             'endTime': 1501867701677,
             'node': 'leaf6',
             'type': 'single',
-            'entity': 'single'
+            'entity': 'single',
+            'ONLINE' : False,
+            'endSent': False
 
         }
         self.addEvent(eventRecord)
@@ -785,8 +789,9 @@ class groundTruth():
             'endTime': 1501868006351,
             'node': 'spine2',
             'type': 'single',
-            'entity': 'single'
-
+            'entity': 'single',
+            'ONLINE' : False,
+            'endSent': False
 
         }
         self.addEvent(eventRecord)
@@ -798,7 +803,9 @@ class groundTruth():
             'endTime': 1501868312576,
             'node': 'leaf2',
             'type': 'single',
-            'entity': 'single'
+            'entity': 'single',
+            'ONLINE' : False,
+            'endSent': False
 
         }
         self.addEvent(eventRecord)
@@ -810,7 +817,10 @@ class groundTruth():
             'endTime': 1501868343454,
             'node': 'leaf8',
             'type': 'single',
-            'entity': 'single'
+            'entity': 'single',
+            'ONLINE' : False,
+            'endSent': False
+
         }
         self.addEvent(eventRecord)
 #        
@@ -821,7 +831,9 @@ class groundTruth():
             'endTime': 1501868606662,
             'node': 'spine1',
             'type': 'single',
-            'entity': 'single'
+            'entity': 'single',
+            'ONLINE' : False,
+            'endSent': False
 
         }
         self.addEvent(eventRecord)
@@ -833,8 +845,9 @@ class groundTruth():
             'endTime': 1501868650995,
             'node': 'spine2',
             'type': 'single',
-            'entity': 'single'
-
+            'entity': 'single',
+            'ONLINE' : False,
+            'endSent': False
         }
         self.addEvent(eventRecord)
 #        
@@ -845,8 +858,9 @@ class groundTruth():
             'endTime': 1501868714299,
             'node': 'spine3',
             'type': 'single',
-            'entity': 'single'
-
+            'entity': 'single',
+            'ONLINE' : False,
+            'endSent': False
         }
         self.addEvent(eventRecord)
 

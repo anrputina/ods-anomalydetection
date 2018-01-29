@@ -1,2 +1,8 @@
 .DS_Store
 *.pyc
+Examples/exampleLongSimulation.py
+Examples/NewExampleOldDatasets.py
+Examples/readGroundTruth.py
+Examples/result.txt
+DemoGui/
+Examples/LightReorganization.py
