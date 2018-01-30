@@ -281,4 +281,4 @@ statistics.getDelay(results, kMAX=5, plot=True, samplingRate=4)
 
 
 #### Results
-The Dataset in use it is available at https://github.com/cisco-ie/telemetry
+The Dataset in use is available at https://github.com/cisco-ie/telemetry
