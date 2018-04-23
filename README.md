@@ -83,5 +83,7 @@ from DenStream import DenStream
 ...
 ```
 
-#### Dataset
+Dataset
+---
+
 The Dataset in use is available at https://github.com/cisco-ie/telemetry
