@@ -86,4 +86,9 @@ from DenStream import DenStream
 Dataset
 ---
 
-The Dataset in use is available at https://github.com/cisco-ie/telemetry
+The Dataset in use is available here: https://github.com/cisco-ie/telemetry
+
+Demo
+---
+
+A demo of the algorithm is available here: https://telemetry.telecom-paristech.fr/
