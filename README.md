@@ -4,7 +4,15 @@
 
 OutlierDenStream is a custom implementation of the DenStream algorithm used for Anomaly Detection in an Unsupervised environment written in Python.  The implementation has been developed for a project funded by NewNet@Paris, Cisco's Chair at Telecom ParisTech, in the context of the telemetry project https://telemetry.telecom-paristech.fr/
 
-This implementation has been used in our upcoming ACM SIGCOMM BigDAMA paper. We release the code (which is generic) as well as the dataset and experimental setup (specific for reproducing our scientific results). See below for further details.
+
+Related repositories
+--------------------
+The code released in this website are also instrumental to reproduce results that are published in [ACM SIGCOMM BigDama'18] and that are demonstrated at [IEEE INFOCOM'18] (see the Reference section below)
+
+This repository only contains the dataset, whereas related repositories contain
+- the datasets we released to the community https://github.com/cisco-ie/telemetry/blob/master/README.md
+- specific instruction and code to replicate the paper results https://github.com/anrputina/OutlierDenStream-BigDama18
+
 
 
 Description
@@ -95,3 +103,12 @@ Demo
 ---
 
 A demo of the algorithm is available here: https://telemetry.telecom-paristech.fr/
+
+
+References
+---------
+
+[ACM SIGCOMM BigDama'18] Putina, Andrian and Rossi, Dario and Bifet, Albert and Barth, Steven and Pletcher, Drew and Precup, Cristina and Nivaggioli, Patrice,  Telemetry-based stream-learning of BGP anomalies ACM SIGCOMM Workshop on Big Data Analytics and Machine Learning for Data Communication Networks (Big-DAMA’18) aug. 2018
+
+[IEEE INFOCOM'18] Putina, Andrian and Rossi, Dario and Bifet, Albert and Barth, Steven and Pletcher, Drew and Precup, Cristina and Nivaggioli, Patrice,  Unsupervised real-time detection of BGP anomalies leveraging high-rate and fine-grained telemetry data IEEE INFOCOM, Demo Session apr. 2018,
+
