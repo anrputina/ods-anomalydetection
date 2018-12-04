@@ -2,7 +2,7 @@
 ===================
 
 
-OutlierDenStream is a custom implementation of the DenStream algorithm used for Anomaly Detection in an Unsupervised environment written in Python.  The implementation has been developed for a project funded by NewNet@Paris, Cisco's Chair at Telecom ParisTech, in the context of the telemetry project https://telemetry.telecom-paristech.fr/
+OutlierDenStream is a custom implementation of the [DenStream] algorithm used for Anomaly Detection in an Unsupervised environment written in Python.  The implementation has been developed for a project funded by NewNet@Paris, Cisco's Chair at Telecom ParisTech, in the context of the telemetry project https://telemetry.telecom-paristech.fr/
 
 
 Description
@@ -97,3 +97,4 @@ References
 
 [IEEE INFOCOM'18] Putina, Andrian and Rossi, Dario and Bifet, Albert and Barth, Steven and Pletcher, Drew and Precup, Cristina and Nivaggioli, Patrice,  Unsupervised real-time detection of BGP anomalies leveraging high-rate and fine-grained telemetry data IEEE INFOCOM, Demo Session apr. 2018,
 
+[DenStream] Feng Cao, Martin Estert, Weining Qian, and Aoying Zhou, "Density-Based Clustering over an Evolving Data Stream with Noise" in Proceedings of the 2006 SIAM International Conference on Data Mining. 2006, 328-339 
