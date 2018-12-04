@@ -9,9 +9,11 @@ Created on Thu Jun 29 17:48:58 2017
 class Cluster():
     def __init__(self):
         self.clusters = []
+        self.N = 0
         
     def insert(self, mc):
         self.clusters.append(mc)
+        self.N += 1
         
     def show(self):
         print 'Number of Clusters: ' + str(len(self.clusters))

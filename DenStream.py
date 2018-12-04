@@ -22,7 +22,7 @@ from microCluster import MicroCluster
 class DenStream():
     
     def __init__(self, lamb, epsilon=1, minPts=1, beta=1, mu=1,\
-                numberInitialSamples=None, startingBuffer=None, tp=12):
+                numberInitialSamples=None, startingBuffer=None, tp=60):
 
         ### Algorithm parameters ###  
         self.lamb = lamb
@@ -38,7 +38,7 @@ class DenStream():
         ### Check input type: epsilon ### 
         if isinstance(epsilon, int) or isinstance(epsilon, float):
             self.epsilon = epsilon
-        elif isinstance(epsilon, str):
+        elif isinstance(epsilon, str) or isinstance(epsilon, unicode):
             if epsilon == 'auto':
                 self.epsilon = 'auto'
         else:
@@ -47,12 +47,12 @@ class DenStream():
         ### Check input type: mu ###
         if isinstance(mu, int) or isinstance(mu, float):
             self.mu = mu
-        elif isinstance(mu, str):
+        elif isinstance(mu, str) or isinstance(mu, unicode):
             if mu == 'auto':
                 self.mu = 'auto'
         else:
             sys.exit('Error in parameter: mu')
-        
+
         ### Running parameters ###
         self.inizialized = False
 
@@ -108,18 +108,25 @@ class DenStream():
         sample = Sample(self.buffer.iloc[0].values, 0)
         sample.setTimestamp(1)
         
-        mc = MicroCluster(1, self.lamb)
+        mc = MicroCluster(1, self.lamb, self.pMicroCluster.N + 1)
         
+        maxEpsilon = 0
+
         for sampleNumber in range(0, len(self.buffer)):
             sample = Sample(self.buffer.iloc[sampleNumber].values, sampleNumber)
             sample.setTimestamp(sampleNumber+1)
             mc.insertSample(sample, self.currentTimestamp)
+
+            if mc.radius > maxEpsilon:
+                maxEpsilon = mc.radius
+                # print 'New max: {}'.format(mc.radius)
             
         self.pMicroCluster.insert(mc)
 
         if isinstance(self.epsilon, str):
             if self.epsilon == 'auto':
-                self.epsilon = self.pMicroCluster.clusters[0].radius * self.radiusFactor 
+                self.epsilon = self.pMicroCluster.clusters[0].radius * self.radiusFactor
+                self.epsilon = maxEpsilon 
         
     def nearestCluster (self, sample, timestamp, kind):
         minDist = 0.0
@@ -158,8 +165,7 @@ class DenStream():
             
             if (cluster != mc):
                 cluster.noNewSamples()
-        
-        
+
     def runInitialization(self):
         self.resetLearningImpl()
         self.initWithoutDBScan()
@@ -196,6 +202,7 @@ class DenStream():
                 if (backupClosestCluster.radius <= self.epsilon):
 
                     closestMicroCluster.insertSample(sample, self.currentTimestamp)
+                    sample.setMicroClusterNumber(closestMicroCluster.clusterNumber)
                     merged = True
                     TrueOutlier = False
                     returnOutlier = False
@@ -212,16 +219,19 @@ class DenStream():
                 if (backupClosestCluster.radius <= self.epsilon):
                     closestMicroCluster.insertSample(sample, self.currentTimestamp)
                     merged = True
+                    sample.setMicroClusterNumber(closestMicroCluster.clusterNumber)
                     
                     if (closestMicroCluster.weight > self.beta * self.mu):
                         self.oMicroCluster.clusters.pop(self.oMicroCluster.clusters.index(closestMicroCluster))
+                        closestMicroCluster.clusterNumber = self.pMicroCluster.N + 1
                         self.pMicroCluster.insert(closestMicroCluster)
+
                     
                     self.updateAll(closestMicroCluster)
                         
                     
             if not merged:
-                newOutlierMicroCluster = MicroCluster(1, self.lamb)
+                newOutlierMicroCluster = MicroCluster(1, self.lamb, 0)
                 newOutlierMicroCluster.insertSample(sample, self.currentTimestamp)
                                 
                 for clusterTest in self.pMicroCluster.clusters:
@@ -231,9 +241,12 @@ class DenStream():
 
                 if TrueOutlier:
                     self.oMicroCluster.insert(newOutlierMicroCluster)
+                    sample.setMicroClusterNumber(0)
                     self.updateAll(newOutlierMicroCluster)
                 else:
+                    newOutlierMicroCluster.clusterNumber = self.pMicroCluster.N + 1
                     self.pMicroCluster.insert(newOutlierMicroCluster)
+                    sample.setMicroClusterNumber(newOutlierMicroCluster.clusterNumber)
                     self.updateAll(newOutlierMicroCluster)
                     returnOutlier = False
                 
@@ -260,16 +273,11 @@ class DenStream():
                 record = {
                     'pMicroClusters': self.pMicroCluster.clusters,
                     'oMicroClusters': self.oMicroCluster.clusters,
-                    'result': returnOutlier
+                    'result': returnOutlier,
+                    'sample': sample
                 }
 
                 return record
 
             else:
                 return returnOutlier
-
-
-
-
-
-

@@ -21,3 +21,6 @@ class Sample():
         
     def setRealTimestamp(self, timestamp):
         self.realTimestamp = timestamp
+
+    def setMicroClusterNumber(self, microClusterNumber):
+        self.microClusterNumber = microClusterNumber

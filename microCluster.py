@@ -14,7 +14,7 @@ def computeReductionFactor(lamb, steps):
     return math.pow(2, -lamb * steps)
 
 class MicroCluster():
-    def __init__(self, currenttimestamp, lamb):
+    def __init__(self, currenttimestamp, lamb, clusterNumber):
 
         self.dimensions = None
                 
@@ -22,6 +22,7 @@ class MicroCluster():
         self.lamb = lamb
 
         self.reductionFactor = computeReductionFactor(self.lamb, 1)
+        self.clusterNumber = clusterNumber
                         
     def insertSample(self, sample, timestamp):
 
@@ -57,9 +58,8 @@ class MicroCluster():
         LSd = np.power(self.center, 2)
         SSd = np.divide(self.SS, float(self.weight))
 
-        maxRad = np.nanmax(np.sqrt(SSd-LSd))
+        maxRad = np.nanmax(np.sqrt(SSd.astype(float)-LSd.astype(float)))
         # maxRad = np.nanmax(np.lib.scimath.sqrt(SSd-LSd))
-                    
         self.radius = maxRad        
 
     def noNewSamples(self):
