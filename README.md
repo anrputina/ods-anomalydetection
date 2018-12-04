@@ -5,16 +5,6 @@
 OutlierDenStream is a custom implementation of the DenStream algorithm used for Anomaly Detection in an Unsupervised environment written in Python.  The implementation has been developed for a project funded by NewNet@Paris, Cisco's Chair at Telecom ParisTech, in the context of the telemetry project https://telemetry.telecom-paristech.fr/
 
 
-Related repositories
---------------------
-The code released in this website are also instrumental to reproduce results that are published in [ACM SIGCOMM BigDama'18] and that are demonstrated at [IEEE INFOCOM'18] (see the Reference section below)
-
-This repository only contains the dataset, whereas related repositories contain
-- the datasets we released to the community https://github.com/cisco-ie/telemetry/blob/master/README.md
-- specific instruction and code to replicate the paper results https://github.com/anrputina/OutlierDenStream-BigDama18
-
-
-
 Description
 -------------
 
@@ -71,18 +61,6 @@ for row in dataset:
 The example shows the simulation of an experiment in which we have a dataset <img src="https://latex.codecogs.com/gif.latex?X&space;\in&space;R&space;^&space;{N,&space;F}" title="X \in R ^ {N, F}" /> where N is the number of samples and F of features. Each row of F elements is extracted from the dataset and a **Sample** object is instantiated by it. The Sample object is composed by the main attributes **.value** and **.timestamp** which are respectively the array of the F measurements and the time (the timestamp is used just to retrieve the real timestamp, not for clustering purpose).
 Thus on each new available sample, the **.runOnNewSample()** method is run and the *Normal* or *Abnormal* label is obtained.  
 
-Coming Soon
--------------
-
-
-* Examples and Results
-* Detailed description of the algorithm
-* Detailed description of classes and methods
-* Detailed description of class **Statistics**: How to compute Precision, Recall, False Positive Rate (if **ground truth** available)
-* Introduction to **Detection of order K** (count the number of consecutive abnormal samples and raise an alarm only after K consecutive abnormal samples)
-* Possibility to execute the code using the real sampling time and not discretized times as 'timestamp = 1, timestamp = 2, ..., timestamp = N'
-* Possibility to execute the code in real time, without using a dataset
-
 Installation
 ---
 
@@ -94,16 +72,23 @@ from DenStream import DenStream
 ...
 ```
 
-Dataset
----
+Related repositories
+--------------------
+The code released in this website are also instrumental to reproduce results that are published in [ACM SIGCOMM BigDama'18] and that are demonstrated at [IEEE INFOCOM'18] (see the Reference section below)
 
-The Dataset in use is available here: https://github.com/cisco-ie/telemetry
+This repository only contains the algorithm, whereas related repositories contain
+- the datasets we released to the community https://github.com/cisco-ie/telemetry/blob/master/README.md
+- specific instruction and code to replicate the paper results https://github.com/anrputina/OutlierDenStream-BigDama18
 
 Demo
 ---
 
 A demo of the algorithm is available here: https://telemetry.telecom-paristech.fr/
 
+Dataset
+---
+
+The Dataset in use is extracted from: https://github.com/cisco-ie/telemetry
 
 References
 ---------
