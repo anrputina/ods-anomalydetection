@@ -16,12 +16,12 @@ class Cluster():
         self.N += 1
         
     def show(self):
-        print 'Number of Clusters: ' + str(len(self.clusters))
+        print ('Number of Clusters: ' + str(len(self.clusters)))
         print ('-----')
         
         for cluster in self.clusters:
-            print 'Cluster #'+str(self.clusters.index(cluster))
-            print 'Samples: '+str(cluster.N)
-            print 'Weight: '+str(cluster.weight)
-            print 'Creation Time: '+str(cluster.creationTimeStamp)
-            print 'LastEdit Time: '+str(cluster.lastEditTimeStamp)
+            print ('Cluster #'+str(self.clusters.index(cluster)))
+            print ('Samples: '+str(cluster.N))
+            print ('Weight: '+str(cluster.weight))
+            print ('Creation Time: '+str(cluster.creationTimeStamp))
+            print ('LastEdit Time: '+str(cluster.lastEditTimeStamp))

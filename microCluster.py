@@ -27,7 +27,13 @@ class MicroCluster():
     def insertSample(self, sample, timestamp):
 
         if self.dimensions == None:
-            self.dimensions = len(sample.value)
+
+            if isinstance(sample.value, type(list)):
+                self.dimensions = len(sample.value)
+            elif isinstance(sample.value, float):
+                self.dimensions = 1
+            else:
+                sys.exit('Error instance sample.value type')
 
             ### incremental parameteres ###
             self.N = 0

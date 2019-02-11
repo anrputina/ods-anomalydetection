@@ -13,7 +13,7 @@ import math
 import time
 import numpy as np
 
-from sklearn.cluster import DBSCAN
+# from sklearn.cluster import DBSCAN
 
 from sample import Sample
 from cluster import Cluster
@@ -23,8 +23,9 @@ class DenStream():
     
     def __init__(self, lamb, epsilon=1, minPts=1, beta=1, mu=1,\
                 numberInitialSamples=None, startingBuffer=None, tp=60):
-
-        ### Algorithm parameters ###  
+        """
+        Algorithm parameters
+        """
         self.lamb = lamb
         self.minPts = minPts
         self.beta = beta
@@ -78,34 +79,34 @@ class DenStream():
             if self.mu == 'auto':
                 self.mu = (1/(1-math.pow(2, -self.lamb)))
                 
-    def initialDBScanSciLearn(self):
+    # def initialDBScanSciLearn(self):
         
-        db = DBSCAN(eps=8, min_samples=self.minPts, algorithm='brute').fit(self.buffer)
-        clusters = db.labels_
-        self.buffer['clusters'] = clusters
+    #     db = DBSCAN(eps=8, min_samples=self.minPts, algorithm='brute').fit(self.buffer)
+    #     clusters = db.labels_
+    #     self.buffer['clusters'] = clusters
         
-        clusterNumber = np.unique(clusters)
+    #     clusterNumber = np.unique(clusters)
         
-        for clusterId in clusterNumber:
+    #     for clusterId in clusterNumber:
             
-            if (clusterId != -1):
+    #         if (clusterId != -1):
                 
-                cl = self.buffer[self.buffer['clusters'] == clusterId]
-                cl = cl.drop('clusters', axis=1)
+    #             cl = self.buffer[self.buffer['clusters'] == clusterId]
+    #             cl = cl.drop('clusters', axis=1)
                 
-                sample = Sample(cl.iloc[0].tolist())
+    #             sample = Sample(cl.iloc[0].tolist())
                                 
-                mc = MicroCluster(sample, self.currentTimestamp, self.lamb)
+    #             mc = MicroCluster(sample, self.currentTimestamp, self.lamb)
                 
-                for sampleNumber in range(len(cl[1:])):
-                    sample = Sample(cl.iloc[sampleNumber].tolist())
-                    mc.insertSample(sample, self.currentTimestamp)
+    #             for sampleNumber in range(len(cl[1:])):
+    #                 sample = Sample(cl.iloc[sampleNumber].tolist())
+    #                 mc.insertSample(sample, self.currentTimestamp)
                     
-                self.pMicroCluster.insert(mc)
+    #             self.pMicroCluster.insert(mc)
                 
     def initWithoutDBScan(self):
         
-        sample = Sample(self.buffer.iloc[0].values, 0)
+        sample = Sample(self.buffer.iloc[0], 0)
         sample.setTimestamp(1)
         
         mc = MicroCluster(1, self.lamb, self.pMicroCluster.N + 1)
@@ -113,13 +114,12 @@ class DenStream():
         maxEpsilon = 0
 
         for sampleNumber in range(0, len(self.buffer)):
-            sample = Sample(self.buffer.iloc[sampleNumber].values, sampleNumber)
+            sample = Sample(self.buffer.iloc[sampleNumber], sampleNumber)
             sample.setTimestamp(sampleNumber+1)
             mc.insertSample(sample, self.currentTimestamp)
 
             if mc.radius > maxEpsilon:
                 maxEpsilon = mc.radius
-                # print 'New max: {}'.format(mc.radius)
             
         self.pMicroCluster.insert(mc)
 
