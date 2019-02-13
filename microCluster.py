@@ -6,7 +6,7 @@ Created on Thu Jun 29 17:46:51 2017
 @author: anr.putina
 """
 
-import math
+import math, sys
 import numpy as np
 import datetime
 
@@ -32,7 +32,11 @@ class MicroCluster():
                 self.dimensions = len(sample.value)
             elif isinstance(sample.value, float):
                 self.dimensions = 1
+            elif isinstance(sample.value, np.ndarray):
+                self.dimensions = len(sample.value)
             else:
+                print ('Received {}'.format(sample.value))
+                print ('Type {}'.format(type(sample.value)))
                 sys.exit('Error instance sample.value type')
 
             ### incremental parameteres ###

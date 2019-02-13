@@ -106,7 +106,7 @@ class DenStream():
                 
     def initWithoutDBScan(self):
         
-        sample = Sample(self.buffer.iloc[0], 0)
+        sample = Sample(self.buffer[0], 0)
         sample.setTimestamp(1)
         
         mc = MicroCluster(1, self.lamb, self.pMicroCluster.N + 1)
@@ -114,7 +114,7 @@ class DenStream():
         maxEpsilon = 0
 
         for sampleNumber in range(0, len(self.buffer)):
-            sample = Sample(self.buffer.iloc[sampleNumber], sampleNumber)
+            sample = Sample(self.buffer[sampleNumber], sampleNumber)
             sample.setTimestamp(sampleNumber+1)
             mc.insertSample(sample, self.currentTimestamp)
 
