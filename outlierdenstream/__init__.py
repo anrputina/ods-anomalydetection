@@ -7,4 +7,4 @@ __email__ = 'anr.putina@gmail.com'
 __version__ = '0.0.1'
 __name__ = 'outlierdenstream'
 
-from .outlierdenstream import OutlierDenStream
+from .outlierdenstream import Sample, MicroCluster, Cluster, OutlierDenStream

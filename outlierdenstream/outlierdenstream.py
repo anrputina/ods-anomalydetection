@@ -18,27 +18,56 @@ import numpy as np
     
 class Sample():
     
-    def __init__(self, value, timestamp):
+    """
+    Each record of the stream has to be declared as a `Sample` class.
+
+    :param value: the `values` of the current sample. 
+    :param timestamp: the `timestamp` of current sample.
+
+    """
+
+    def __init__(self, value, timestamp: int):
         self.value = value
         self.timestamp = 0
         self.realTimestamp = timestamp
         
     def getValue(self):
+        """
+        :return: :attr:`value`
+        """
         return self.value
     
-    def setTimestamp(self, timestamp):
+    def setTimestamp(self, timestamp: int):
+        """
+        :set: :attr:`timestamp`
+        """
         self.timestamp = timestamp
         
     def setRealTimestamp(self, timestamp):
         self.realTimestamp = timestamp
 
-    def setMicroClusterNumber(self, microClusterNumber):
+    def setMicroClusterNumber(self, microClusterNumber: int):
+        """
+        Assign to each sample the microClusterNumber in which was merged.
+
+        :set: :attr:`microClusterNumber`
+        """
         self.microClusterNumber = microClusterNumber
 
 def computeReductionFactor(lamb, steps):
     return math.pow(2, -lamb * steps)
 
 class MicroCluster():
+
+    """
+    Micro-Cluster class
+
+    :param currenttimestamp: the `timestamp` in which the cluster is created.
+    :param lamb: the `lamb` parameter used as decay factor.
+    :param clusterNumber: the `number` of the micro-cluster.
+
+    """
+
     def __init__(self, currenttimestamp, lamb, clusterNumber):
 
         self.dimensions = None
@@ -49,7 +78,14 @@ class MicroCluster():
         self.reductionFactor = computeReductionFactor(self.lamb, 1)
         self.clusterNumber = clusterNumber
                         
-    def insertSample(self, sample, timestamp):
+    def insertSample(self, sample, timestamp=0):
+
+        """
+        Adds a sample to a micro-cluster. Updates the variables of the micro-cluster with :meth:`updateRealTimeWeight` and :meth:`updateRealTimeLSandSS`
+
+        :param sample: the `sample` object 
+        :param timestamp: deprecated, not needed anymore. Will be removed in the next versions.
+        """
 
         if self.dimensions == None:
 
@@ -77,11 +113,20 @@ class MicroCluster():
         self.updateRealTimeLSandSS(sample)
         
     def updateRealTimeWeight(self):
+
+        """
+        Updates the Weight of the micro-cluster by the fading factor and increases it by 1. 
+        """
         
         self.weight *= self.reductionFactor
         self.weight += 1
         
     def updateRealTimeLSandSS(self, sample):
+        """
+        Updates the `Weighted Linear Sum` (WLS), the `Weighted Squared Sum` (WSS), the `center` and the `radius` of the micro-cluster when a new sample is merged. 
+
+        :param sample: the `sample` to merge into the micro-cluster.
+        """
         self.LS = np.multiply(self.LS, self.reductionFactor)
         self.SS = np.multiply(self.SS, self.reductionFactor)
                 
@@ -98,22 +143,43 @@ class MicroCluster():
         self.radius = maxRad        
 
     def noNewSamples(self):
+        """
+        Updates the `Weighted Linear Sum` (WLS), the `Weighted Squared Sum` (WSS) and the weight of the micro-cluster when no new samples are merged.
+        """
         self.LS = np.multiply(self.LS, self.reductionFactor)
         self.SS = np.multiply(self.SS, self.reductionFactor)
         self.weight = np.multiply(self.weight, self.reductionFactor)
                 
     def getCenter(self):
+        """
+        :return: the `center` of the micro-cluster.
+        """
         return self.center
 
     def getRadius(self):
+        """
+        :return: the `radius` of the micro-cluster.
+        """
         return self.radius
 
 class Cluster():
+
+    """
+    Cluster class. Contains the list of the micro-cluster and the number of micro-clusters.
+    """
+
     def __init__(self):
         self.clusters = []
         self.N = 0
         
     def insert(self, mc):
+        """
+        Inserts a micro-cluster into the cluster
+
+        :param mc: the `micro-cluster` to be added to the list of the micro-clusters that make up the cluster.
+
+        Increases the counter of micro-clusters into the cluster by 1.
+        """
         self.clusters.append(mc)
         self.N += 1
         
@@ -130,11 +196,20 @@ class Cluster():
 
 class OutlierDenStream():
     
+    """
+    OutlierDenStream class. 
+
+    :param lamb: the `lamb` parameter - fading factor
+    :param epsilon: the `epsilon` parameter 
+    :param beta: the `beta` parameter
+    :param mu: the `mu` parameter
+    :param numberInitialSamples: samples to use as initial buffer
+    :param startgingBuffer: initial `buffer` on which apply DBScan or use it as unique class.
+    :param tp: frequency at which to apply the pruning strategy and remove old micro-clusters.
+    """
+
     def __init__(self, lamb, epsilon=1, minPts=1, beta=1, mu=1,\
                 numberInitialSamples=None, startingBuffer=None, tp=60):
-        """
-        Algorithm parameters
-        """
         self.lamb = lamb
         self.minPts = minPts
         self.beta = beta
@@ -174,6 +249,12 @@ class OutlierDenStream():
         
     def resetLearningImpl(self):
         
+        """
+        Initializes two empty `Cluster` as a p-micro-cluter list and o-micro-cluster list.
+        
+        If `mu` is `auto` computes the value
+        """
+
         if simulation:
             self.currentTimestamp = 0
         else:
@@ -214,6 +295,12 @@ class OutlierDenStream():
     #             self.pMicroCluster.insert(mc)
                 
     def initWithoutDBScan(self):
+
+        """
+        Produces a micro-cluster merging all the samples passed into the initial buffer
+
+        If `epsilon` is auto computes `epsilon` as the maxium radius obtained from these initial samples.
+        """
         
         sample = Sample(self.buffer[0], 0)
         sample.setTimestamp(1)
@@ -276,6 +363,9 @@ class OutlierDenStream():
                 cluster.noNewSamples()
 
     def runInitialization(self):
+        """
+        Initializes the variables of the main algorithm with the methods :meth:`resetLearningImpl` and :meth:`initWithoutDBScan`
+        """
         self.resetLearningImpl()
         self.initWithoutDBScan()
         self.inizialized = True
