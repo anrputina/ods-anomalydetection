@@ -1,0 +1,17 @@
+language: python
+python:
+- 3.6
+- 3.5
+- 3.4
+install: pip install -U tox-travis
+script: tox
+deploy:
+  provider: pypi
+  distributions: sdist bdist_wheel
+  user: anrputina
+  password:
+    secure: fXJSeu5R3hlGRXwg8SODrVkahsgMMZ5kjzacJETU9MBKg5sOuS8qE/Y4QHdm4VwzBjRvXFX1+lx+ppf7HIJDH5AizyPz/w26kMvSO4OlnsJmndniQS/CTw1ZxtSRFoZMwkW1VGej4a40t4hj3kIt6tQirn/mjvMZN2/K9lqVLiqx2m4nJXTmpKrffevm8ZkIAh4fQFVzNsjm8jJDEL2y+C+Y7psILQ8jjjzYyS2qsY4e5WRM1SbASwH+pzWIjMWqIY0bl7G4w53cAzGHiRfwCxLiX90VA3qMFWPfT4j1gsn/lR1Ncrdz82V9JQtjA6c9Rwz8TJ4z2kOCXsb3WpIU5ZovlZnNDYxihInXVXaS01rKfO6QyZz7gbV2ic2Tzsz6punev9FpaBe49nMLlyyy/HEeDDlbLFWGajhC9ezvL/a+AXx3dk+jPXpcRVrLInLxqQludcdiVhl4AdOjHvHRrL0aIm55dqLi2SBNPqgelxouqWXj2PupqZn5JADODOVq3G+wfdA1pwXlMf6muzt9Vl6TtA/vN63kmIkogK7llA02zQqdrjnr01Q+4aPbnJVJ3KyH3gPzb33kpXyvSJQEmb9MgcosI6bbouBJkZ+QttpYpcDKInKUdxMraKSvEv0fdUTl7R81zhi2NVHO6BIwRNfWqGaRIrG4e7V9oeiDVok=
+  on:
+    tags: true
+    repo: anrputina/outlierdenstream
+    python: 3.6
