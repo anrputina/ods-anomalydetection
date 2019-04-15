@@ -199,7 +199,7 @@ class OutlierDenStream():
     """
     OutlierDenStream class. 
 
-    :param lamb: the `lamb` parameter - fading factor
+    :param lamb: the `lambda` parameter - fading factor
     :param epsilon: the `epsilon` parameter 
     :param beta: the `beta` parameter
     :param mu: the `mu` parameter
@@ -371,6 +371,19 @@ class OutlierDenStream():
         self.inizialized = True
     
     def runOnNewSample(self, sample):
+
+        """
+        Performs the basic DenStream procedure for merging new samples.
+
+            * Try to merge the sample to the closest core-micro-cluster (or)
+            * Try to merge the sample to the closest outlier-micro-cluster (or)
+            * Generate new outlier-micro-cluster by the sample
+
+        :param sample: the new available `sample` in the stream
+
+        :return: ``False`` if the sample is merged to an existing core-micro-cluster otherwise ``True`` meaning "anomalous" sample.  
+
+        """
 
         if simulation:
             self.currentTimestamp += 1

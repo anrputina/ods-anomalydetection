@@ -38,60 +38,24 @@ Documents
 
 The first phase of the algorithm consist in discovering the clusters thus there is the need first of all to gather samples or use a buffer dataset then run then DBScan algorithm and obtain the clusters. From now on it is possible to maintain them incrementally. On the other hand it is possible to use the buffer dataset as a unique cluster without applying DBScan such that all the samples are considered as belonging to a cluster. 
 
-The input parameters are the following one:
+The input parameters are the following one
 
-> * **lamb**: the fading factor <img src="https://latex.codecogs.com/gif.latex?\lambda" title="\lambda" />
-> * **epsilon**: the radius <img src="https://latex.codecogs.com/gif.latex?\epsilon" title="\epsilon" />
->   * **'auto'**: computes automatically the radius of the initial cluster (if you don't use the initial DBScan)
->   * **int** or **float**: <img src="https://latex.codecogs.com/gif.latex?\epsilon" title="\epsilon" /> value integer of float
-> * **minPts**: DBScan parameter, if used
-> * **beta**: potential factor <img src="https://latex.codecogs.com/gif.latex?\beta" title="\beta" />
-> * **mu**: cluster weight <img src="https://latex.codecogs.com/gif.latex?\mu" title="\mu" />
->   * **'auto'**: computes automatically the maximum weight of the cluster, due to fading function
->   * **int** or **float**:  <img src="https://latex.codecogs.com/gif.latex?\mu" title="\mu" /> value integer or float
-> * **numberInitialSample**: number of samples needed before starting the DBScan algorithm on the gathered samples. Only if you use DBSCan.
-> * **startingBuffer**: buffer with the initial samples
-> * **tp**: checking period of the clusters weight. Needed for pruning, if the weight of the clusters goes below the threshold <img src="https://latex.codecogs.com/gif.latex?\beta&space;\cdot&space;\mu" title="\beta \cdot \mu" />: remove them.
-
-Example:
-
-```python
-from DenStream import DenStream
-...
-den = DenStream (lamb=0.03, epsilon='auto', beta=0.03, mu='auto', startingBuffer=bufferDf, tp=12)
-
-den.runInitialization()
-```
-
-This example shows the case in which a buffer is passed to the algorithm, thus there is not the need to wait for the incoming data. Moreover **epsilon** and **mu** are set to **'auto'** thus we are not going to perform the initial DBScan meaning that the samples passed in the buffer have to be considered as samples belonging to a unique initial cluster and the parameters can be computed by this last one. The method **.runInitialization()** performs indeed these tasks and in particular creates a cluster by the samples and computes <img src="https://latex.codecogs.com/gif.latex?\epsilon" title="\epsilon" /> and <img src="https://latex.codecogs.com/gif.latex?\mu" title="\mu" />.
-
-The algorithm is now able to maintain the clusters incrementally. As soon as a new sample is available it is possible to call the **.onNewSample(Sample sample)** method. This one takes as input the object **Sample** and returns the label.
-
-Example:
-```python
-from sample import Sample
-...
-for row in dataset:
-    sample = Sample(row, timestamp)
-    result = den.runOnNewSample(sample)
-```
-
-The example shows the simulation of an experiment in which we have a dataset <img src="https://latex.codecogs.com/gif.latex?X&space;\in&space;R&space;^&space;{N,&space;F}" title="X \in R ^ {N, F}" /> where N is the number of samples and F of features. Each row of F elements is extracted from the dataset and a **Sample** object is instantiated by it. The Sample object is composed by the main attributes **.value** and **.timestamp** which are respectively the array of the F measurements and the time (the timestamp is used just to retrieve the real timestamp, not for clustering purpose).
-Thus on each new available sample, the **.runOnNewSample()** method is run and the *Normal* or *Abnormal* label is obtained.  
-
-Installation
----
-
-Clone the repository and import in your project DenStream and Sample
-
-```python
-from sample import Sample
-from DenStream import DenStream
-...
-```
+	* **lamb**: the fading factor :math:`\lambda`
+	* **epsilon**: the radius :math:`\epsilon`
+		* **"auto"**: computes automatically the radius of the initial cluster as the maximum radius of the initial buffer
+		* **int** or **float**: :math:`\epsilon` value integer of float
+	* **minPts**: DBScan parameter, if used (currently disabled)
+	* **beta**: potential factor :math:`\beta`
+	* **mu**: cluster weight :math:`\mu`
+		* **"auto"**: computes automatically the maximum weight of the cluster, due to fading function
+		* **int** or **float**: :math:`\mu` value integer or float
+	* **numberInitialSample**: number of samples needed before starting the DBScan algorithm on the gathered samples. Only if you use DBSCan. (currently disabled)
+	* **startingBuffer**: starting buffer containing the initial samples. The algorithm merges all the samples in a unique "normal" cluster if :math:`\epsilon` and :math:`\mu` are **"auto"**
+	* **tp**: checking period of the clusters weight. Needed for pruning, if the weight of the clusters goes below the threshold :math:`\beta \cdot \mu`: remove them.
 
 Related repositories
---------------------
+-----------------------
+
 The code released in this website are also instrumental to reproduce results that are published in [ACM SIGCOMM BigDama'18] and that are demonstrated at [IEEE INFOCOM'18] (see the Reference section below)
 
 This repository only contains the algorithm, whereas related repositories contain
@@ -99,17 +63,17 @@ This repository only contains the algorithm, whereas related repositories contai
 - specific instruction and code to replicate the paper results https://github.com/anrputina/OutlierDenStream-BigDama18
 
 Demo
----
+-----------------------
 
 A demo of the algorithm is available here: https://telemetry.telecom-paristech.fr/
 
 Dataset
----
+-----------------------
 
-The Dataset in use is extracted from: https://github.com/cisco-ie/telemetry
+The Dataset in use are extracted from: https://github.com/cisco-ie/telemetry
 
 References
----------
+-----------------------
 
 [ACM SIGCOMM BigDama'18] Putina, Andrian and Rossi, Dario and Bifet, Albert and Barth, Steven and Pletcher, Drew and Precup, Cristina and Nivaggioli, Patrice,  Telemetry-based stream-learning of BGP anomalies ACM SIGCOMM Workshop on Big Data Analytics and Machine Learning for Data Communication Networks (Big-DAMA’18) aug. 2018
 
@@ -122,10 +86,12 @@ References
 * Documentation: https://outlierdenstream.readthedocs.io.
 
 
-Features
---------
+Coming soon
+-----------------------
 
-* TODO
+* Release on pip
+* Detailed documentation
+* Examples
 
 Credits
 -------

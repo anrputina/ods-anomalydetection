@@ -8,19 +8,21 @@ Installation
 Stable release
 --------------
 
-To install OutlierDenStream, run this command in your terminal:
+Release on pip index coming soon. Please use the sources
 
-.. code-block:: console
+.. To install OutlierDenStream, run this command in your terminal:
 
-    $ pip install outlierdenstream
+.. .. code-block:: console
 
-This is the preferred method to install OutlierDenStream, as it will always install the most recent stable release.
+..     $ pip install outlierdenstream
 
-If you don't have `pip`_ installed, this `Python installation guide`_ can guide
-you through the process.
+.. This is the preferred method to install OutlierDenStream, as it will always install the most recent stable release.
 
-.. _pip: https://pip.pypa.io
-.. _Python installation guide: http://docs.python-guide.org/en/latest/starting/installation/
+.. If you don't have `pip`_ installed, this `Python installation guide`_ can guide
+.. you through the process.
+
+.. .. _pip: https://pip.pypa.io
+.. .. _Python installation guide: http://docs.python-guide.org/en/latest/starting/installation/
 
 
 From sources
