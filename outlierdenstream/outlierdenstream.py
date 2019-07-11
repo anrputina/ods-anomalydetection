@@ -362,8 +362,9 @@ class OutlierDenStream():
                 self.epsilon = self.radiusFactor * np.median(epsilons)
 
     def initDBScan(self):
+
         """
-        BLA BLA BLA ADD DESCRIPTION
+        Init with DBSCAN
         """                     
 
         db=DBSCAN(eps=0.05, min_samples=2)
