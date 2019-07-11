@@ -9,8 +9,9 @@ import copy
 import math
 import time
 import numpy as np
+import pandas as pd
 
-# from sklearn.cluster import DBSCAN
+from sklearn.cluster import DBSCAN
 
 # from sample import Sample
 # from cluster import Cluster
@@ -127,11 +128,14 @@ class MicroCluster():
 
         :param sample: the `sample` to merge into the micro-cluster.
         """
+
+        sample = np.array(sample.value)
+
         self.LS = np.multiply(self.LS, self.reductionFactor)
         self.SS = np.multiply(self.SS, self.reductionFactor)
                 
-        self.LS = self.LS + sample.value
-        self.SS = self.SS + sample.value**2
+        self.LS = self.LS + sample
+        self.SS = self.SS + np.power(sample, 2)
 
         self.center = np.divide(self.LS, float(self.weight))
 
@@ -148,7 +152,8 @@ class MicroCluster():
         """
         self.LS = np.multiply(self.LS, self.reductionFactor)
         self.SS = np.multiply(self.SS, self.reductionFactor)
-        self.weight = np.multiply(self.weight, self.reductionFactor)
+        # self.weight = np.multiply(self.weight, self.reductionFactor)
+        self.weight *= self.reductionFactor
                 
     def getCenter(self):
         """
@@ -209,14 +214,14 @@ class OutlierDenStream():
     """
 
     def __init__(self, lamb, epsilon=1, minPts=1, beta=1, mu=1,\
-                numberInitialSamples=None, startingBuffer=None, tp=60):
+                numberInitialSamples=None, startingBuffer=None, tp=60, radiusFactor = 1):
         self.lamb = lamb
         self.minPts = minPts
         self.beta = beta
         self.numberInitialSamples = numberInitialSamples
         self.buffer = startingBuffer
         self.tp = tp
-        self.radiusFactor = 1
+        self.radiusFactor = radiusFactor
 
         self.exportVariables = False
 
@@ -224,8 +229,16 @@ class OutlierDenStream():
         if isinstance(epsilon, int) or isinstance(epsilon, float):
             self.epsilon = epsilon
         elif isinstance(epsilon, str) or isinstance(epsilon, unicode):
-            if epsilon == 'auto':
-                self.epsilon = 'auto'
+            self.epsilon = epsilon
+            # if epsilon == 'auto':
+            #     self.epsilon = 'auto'
+            # if epsilon == 'max':
+            #     self.epsilon = 'max'
+            # if epsilon == 'mean':
+            #     self.epsilon = 'mean'
+            # if epsilon == 'median':
+            #     self.epsilon = 'median'
+
         else:
             sys.exit('Error in parameter: epsilon')
 
@@ -268,6 +281,12 @@ class OutlierDenStream():
         if isinstance(self.mu, str):
             if self.mu == 'auto':
                 self.mu = (1/(1-math.pow(2, -self.lamb)))
+
+        if isinstance(self.tp, str):
+            if self.tp == 'auto':
+                self.tp = round((1/self.lamb)*np.log(self.beta*self.mu/(self.beta*self.mu-1)))
+
+        self.th_beta_mu = self.beta * self.mu
                 
     # def initialDBScanSciLearn(self):
         
@@ -308,21 +327,62 @@ class OutlierDenStream():
         mc = MicroCluster(1, self.lamb, self.pMicroCluster.N + 1)
         
         maxEpsilon = 0
+        epsilons = []
 
         for sampleNumber in range(0, len(self.buffer)):
             sample = Sample(self.buffer[sampleNumber], sampleNumber)
             sample.setTimestamp(sampleNumber+1)
             mc.insertSample(sample, self.currentTimestamp)
 
+            epsilons.append(mc.radius)
             if mc.radius > maxEpsilon:
                 maxEpsilon = mc.radius
             
         self.pMicroCluster.insert(mc)
 
         if isinstance(self.epsilon, str):
-            if self.epsilon == 'auto':
-                self.epsilon = self.pMicroCluster.clusters[0].radius * self.radiusFactor
-                self.epsilon = maxEpsilon 
+
+            samplesToSkip = 10
+            maxEps = np.max(epsilons[samplesToSkip:])
+            meanEps = np.mean(epsilons[samplesToSkip:])
+            medianEps = np.median(epsilons[samplesToSkip:])
+
+            self.epsilons = epsilons
+
+            if self.epsilon == 'auto' or self.epsilon == 'max':
+                self.epsilon = maxEpsilon
+
+            if self.epsilon == 'mean':
+                self.epsilon = meanEps
+
+            if self.epsilon == 'median':
+                self.epsilon = medianEps
+
+            if self.epsilon == 'radiusfactor':
+                self.epsilon = self.radiusFactor * np.median(epsilons)
+
+    def initDBScan(self):
+        """
+        BLA BLA BLA ADD DESCRIPTION
+        """                     
+
+        db=DBSCAN(eps=0.05, min_samples=2)
+        db.fit(self.buffer)
+        labels = pd.DataFrame(db.labels_+1) 
+        for x in range(1, labels[0].max()+1):
+            samples = self.buffer[labels[labels[0]==x].index]
+
+            sample = Sample(samples[0], 0)
+            sample.setTimestamp(1)
+
+            mc = MicroCluster(1, self.lamb, self.pMicroCluster.N + 1)
+
+            for sampleNumber in range(0, len(samples)):
+                sample = Sample(samples[sampleNumber], sampleNumber)
+                sample.setTimestamp(sampleNumber+1)
+                mc.insertSample(sample, self.currentTimestamp)
+
+            self.pMicroCluster.insert(mc)
         
     def nearestCluster (self, sample, timestamp, kind):
         minDist = 0.0
@@ -340,13 +400,20 @@ class OutlierDenStream():
             if (minCluster == None):
                 minCluster = cluster
                 minDist = np.linalg.norm(sample.value - cluster.center)
-                
+              
             dist = np.linalg.norm(sample.value - cluster.center)
             dist -= cluster.radius
 
             if (dist < minDist):
                 minDist = dist
                 minCluster = cluster
+
+        if kind == 'cluster':
+            self.dist_nearest_pmc = minDist
+            self.dist_nearest_omc = 0
+        if kind == 'outlier':
+            self.dist_nearest_omc = minDist
+            self.dist_nearest_pmc = 0
                 
         return minCluster
        
@@ -370,6 +437,14 @@ class OutlierDenStream():
         self.initWithoutDBScan()
         self.inizialized = True
     
+    def runDBSCanInitialization(self):
+        """
+        Initializes the variables of the main algorithm with the methods :meth:`resetLearningImpl` and :meth:`initDBScan`
+        """
+        self.resetLearningImpl()
+        self.initDBScan()
+        self.inizialized = True
+
     def runOnNewSample(self, sample):
 
         """
@@ -413,13 +488,21 @@ class OutlierDenStream():
                 
                 if (backupClosestCluster.radius <= self.epsilon):
 
-                    closestMicroCluster.insertSample(sample, self.currentTimestamp)
-                    sample.setMicroClusterNumber(closestMicroCluster.clusterNumber)
-                    merged = True
-                    TrueOutlier = False
-                    returnOutlier = False
+                    # closestMicroCluster.insertSample(sample, self.currentTimestamp)
+                    # sample.setMicroClusterNumber(closestMicroCluster.clusterNumber)
+                    # merged = True
+                    # TrueOutlier = False
+                    # returnOutlier = False
                     
-                    self.updateAll(closestMicroCluster)
+                    # self.updateAll(closestMicroCluster)
+
+                    self.pMicroCluster.clusters.pop(self.pMicroCluster.clusters.index(closestMicroCluster))
+                    self.pMicroCluster.insert(backupClosestCluster)
+                    sample.setMicroClusterNumber(backupClosestCluster.clusterNumber)
+                    merged=True
+                    TrueOutlier=False
+                    returnOutlier=False
+                    self.updateAll(backupClosestCluster)
                     
             if not merged and len(self.oMicroCluster.clusters) != 0:
                 
@@ -429,31 +512,44 @@ class OutlierDenStream():
                 backupClosestCluster.insertSample(sample, self.currentTimestamp)
                 
                 if (backupClosestCluster.radius <= self.epsilon):
-                    closestMicroCluster.insertSample(sample, self.currentTimestamp)
-                    merged = True
-                    sample.setMicroClusterNumber(closestMicroCluster.clusterNumber)
+                    # closestMicroCluster.insertSample(sample, self.currentTimestamp)
+                    # merged = True
+                    # sample.setMicroClusterNumber(closestMicroCluster.clusterNumber)
                     
-                    if (closestMicroCluster.weight > self.beta * self.mu):
-                        self.oMicroCluster.clusters.pop(self.oMicroCluster.clusters.index(closestMicroCluster))
-                        closestMicroCluster.clusterNumber = self.pMicroCluster.N + 1
-                        self.pMicroCluster.insert(closestMicroCluster)
+                    # if (closestMicroCluster.weight > self.beta * self.mu):
+                    #     self.oMicroCluster.clusters.pop(self.oMicroCluster.clusters.index(closestMicroCluster))
+                    #     closestMicroCluster.clusterNumber = self.pMicroCluster.N + 1
+                    #     self.pMicroCluster.insert(closestMicroCluster)
 
                     
-                    self.updateAll(closestMicroCluster)
-                        
-                    
+                    # self.updateAll(closestMicroCluster)
+
+                    merged = True
+                    self.oMicroCluster.clusters.pop(self.oMicroCluster.clusters.index(closestMicroCluster))
+                    # if (backupClosestCluster.weight > self.beta * self.mu):
+                    if (backupClosestCluster.weight > self.th_beta_mu):                        
+                        backupClosestCluster.clusterNumber = self.pMicroCluster.N +1
+                        self.pMicroCluster.insert(backupClosestCluster)
+                    else:
+                        self.oMicroCluster.insert(backupClosestCluster)
+
+                    sample.setMicroClusterNumber(backupClosestCluster.clusterNumber)
+
+                    self.updateAll(backupClosestCluster)
+                                            
             if not merged:
-                newOutlierMicroCluster = MicroCluster(1, self.lamb, 0)
+                newOutlierMicroCluster = MicroCluster(self.currentTimestamp, self.lamb, 0)
                 newOutlierMicroCluster.insertSample(sample, self.currentTimestamp)
                                 
-                for clusterTest in self.pMicroCluster.clusters:
+                # for clusterTest in self.pMicroCluster.clusters:
                     
-                    if np.linalg.norm(clusterTest.center-newOutlierMicroCluster.center) < 2 * self.epsilon:
-                        TrueOutlier = False
+                #     if np.linalg.norm(clusterTest.center-newOutlierMicroCluster.center) < 2 * self.epsilon:
+                #         TrueOutlier = False
 
                 if TrueOutlier:
+                    newOutlierMicroCluster.clusterNumber = self.oMicroCluster.N + 1
                     self.oMicroCluster.insert(newOutlierMicroCluster)
-                    sample.setMicroClusterNumber(0)
+                    sample.setMicroClusterNumber(newOutlierMicroCluster.clusterNumber)
                     self.updateAll(newOutlierMicroCluster)
                 else:
                     newOutlierMicroCluster.clusterNumber = self.pMicroCluster.N + 1
@@ -466,14 +562,15 @@ class OutlierDenStream():
                             
                 for cluster in self.pMicroCluster.clusters:
 
-                    if cluster.weight < self.beta * self.mu:
+                    # if cluster.weight < self.beta * self.mu:
+                    if cluster.weight < self.th_beta_mu:                        
                         self.pMicroCluster.clusters.pop(self.pMicroCluster.clusters.index(cluster))
                         
                 for cluster in self.oMicroCluster.clusters:
                     
                     creationTimestamp = cluster.creationTimeStamp
                         
-                    xs1 = math.pow(2, -self.lamb*(self.currentTimestamp - creationTimestamp + self.tp)) - 1
+                    xs1 = math.pow(2, -self.lamb * (self.currentTimestamp - creationTimestamp + self.tp)) - 1
                     xs2 = math.pow(2, -self.lamb * self.tp) - 1
                     xsi = xs1 / xs2
 
@@ -482,9 +579,14 @@ class OutlierDenStream():
                         self.oMicroCluster.clusters.pop(self.oMicroCluster.clusters.index(cluster))
                         
             if self.exportVariables:
+
                 record = {
-                    'pMicroClusters': self.pMicroCluster.clusters,
-                    'oMicroClusters': self.oMicroCluster.clusters,
+                    'pMicroClusters': len(self.pMicroCluster.clusters),
+                    'oMicroClusters': len(self.oMicroCluster.clusters),
+                    'pmc': copy.deepcopy(self.pMicroCluster.clusters),
+                    'omc':  copy.deepcopy(self.oMicroCluster.clusters),    
+                    'dist_nearest_pmc': self.dist_nearest_pmc,
+                    'dist_nearest_omc': self.dist_nearest_omc,                
                     'result': returnOutlier,
                     'sample': sample
                 }
