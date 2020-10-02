@@ -20,7 +20,7 @@ OutlierDenStream
 
 
 
-OutlierDenStream is a custom implementation of the [DenStream] algorithm used for Anomaly Detection in an Unsupervised environment written in Python.  The implementation has been developed for a project funded by NewNet@Paris, Cisco's Chair at Telecom ParisTech, in the context of the telemetry project https://telemetry.telecom-paristech.fr/
+OutlierDenStream is a custom implementation of the [DenStream] algorithm used for Anomaly Detection in an Unsupervised environment written in Python.
 
 
 Description
