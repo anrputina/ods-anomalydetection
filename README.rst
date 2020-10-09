@@ -54,7 +54,7 @@ Features
 --------
 
 * Free software: MIT license
-* Documentation: https://ods.readthedocs.io.
+* Documentation: https://oadds.readthedocs.io.
 
 Credits
 -------
