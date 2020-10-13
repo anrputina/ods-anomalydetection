@@ -26,7 +26,7 @@ Related repositories
 The code released in this website are also instrumental to reproduce results that are published in [ACM SIGCOMM BigDama'18] and that are demonstrated at [IEEE INFOCOM'18] (see the Reference section below)
 
 This repository only contains the algorithm, whereas related repositories contain
-- [the datasets we released to the community](https://github.com/cisco-ie/telemetry/blob/master/README.md)
+- `the datasets we released to the community <https://github.com/cisco-ie/telemetry/blob/master/README.md>`_
 - specific instruction and code to replicate the paper results https://github.com/anrputina/OutlierDenStream-BigDama18
 
 Demo
@@ -37,7 +37,8 @@ A demo of the first version of the algorithm [ACM SIGCOMM BigDama'18] is availab
 Dataset
 -----------------------
 
-[The Dataset in use are extracted from here](https://github.com/cisco-ie/telemetry)
+`The Dataset in use are extracted from here <https://github.com/cisco-ie/telemetry>`_
+
 
 References
 -----------------------
